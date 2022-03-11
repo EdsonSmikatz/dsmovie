@@ -1,9 +1,13 @@
 package com.devsuperior.dsmovie.entities;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -17,6 +21,11 @@ public class Movie {
 		private Double score;
 		private Integer count;
 		private String image;
+		//Set é uma interface, portanto deve ser instanciada uma classe que implementa a interface
+		
+		@OneToMany(mappedBy ="id.movie")//acessar avaliacoes de um certo filme a partir do obj filme
+		private Set<Score> scores = new HashSet<>(); 
+		
 		
 		public Long getId() {
 			return id;
@@ -83,7 +92,14 @@ public class Movie {
 			this.count = count;
 			this.image = image;
 		}
+
+
+		public Set<Score> getScores() {
+			return scores;
+		}
 		
 		
+		
+
 		
 }
