@@ -1,14 +1,18 @@
-import axios from "axios"
+import axios, { AxiosRequestConfig } from "axios"
 import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Movie } from "types/movie"
 import { BASE_URL } from "utils/requests"
 import "./styles.css"
+import { validateEmail } from "utils/validate"
 
 type Props = {
   movieId: string
 }
+
 function FormCard({ movieId }: Props) {
+  const navigate = useNavigate() //comando para navegacao, ex: comando de redirecionamento de rota
+
   const [movie, setMovie] = useState<Movie>()
 
   useEffect(() => {
@@ -16,6 +20,33 @@ function FormCard({ movieId }: Props) {
       setMovie(response.data)
     })
   }, [movieId]) //colocar movieId como dependencia para fazer a requisisao somente quando mudar o movieId
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault() //impede que o formulario seja enviado
+
+    const email = (event.target as any).email.value
+    const score = (event.target as any).score.value
+
+    if (!validateEmail(email)) {
+      return
+    }
+
+    const config: AxiosRequestConfig = {
+      //configuração para requisicao axios
+      baseURL: BASE_URL,
+      method: "PUT",
+      url: "/scores",
+      data: {
+        email: email,
+        movieId: movieId,
+        score: score,
+      },
+    }
+    axios(config).then((response) => {
+      //console.log(response.data)
+      navigate("/")
+    })
+  }
 
   return (
     <div className="dsmovie-form-container">
@@ -26,7 +57,7 @@ function FormCard({ movieId }: Props) {
       />
       <div className="dsmovie-card-bottom-container">
         <h3>{movie?.title}</h3>
-        <form className="dsmovie-form">
+        <form className="dsmovie-form" onSubmit={handleSubmit}>
           <div className="form-group dsmovie-form-group">
             <label htmlFor="email">Informe seu email</label>
             <input type="email" className="form-control" id="email" />
